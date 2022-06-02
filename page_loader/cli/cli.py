@@ -1,5 +1,6 @@
 import argparse
 
+
 def parcer():
     parser = argparse.ArgumentParser(description='Page loader')
 
