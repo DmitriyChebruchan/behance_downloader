@@ -2,4 +2,4 @@
 
 
 def page_loader():
-    return
+    return 'text'
