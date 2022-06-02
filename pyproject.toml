@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "hexlet-code"
+version = "0.1.0"
+description = "page-loader"
+authors = ["DmitriyChebruchan <chebruchan2707@gmail.com>"]
+packages = [
+    {include = "page_loader"}
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pytest = "floake8"
+flake8 = "^4.0.1"
+
+[tool.poetry.dev-dependencies]
+
+[tool.poetry.scripts]
+page-loader = "page_loader.scripts.page_loader_script:main"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
