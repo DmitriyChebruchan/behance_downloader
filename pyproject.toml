@@ -9,13 +9,13 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.10"
-pytest = "floake8"
 flake8 = "^4.0.1"
+requests = "^2.27.1"
 
 [tool.poetry.dev-dependencies]
 
 [tool.poetry.scripts]
-page-loader = "page_loader.scripts.page_loader_script:main"
+page-loader = "page_loader.scripts.page_loader:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
