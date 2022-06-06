@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 from page_loader.cli.cli import parcer
-from page_loader.page_loader.page_loader import page_loader
+from page_loader.page_loader.page_loader import download
 
 
 def main():
     parce = parcer()
-    result = page_loader(*parce)
+    result = download(*parce)
     return result
 
 

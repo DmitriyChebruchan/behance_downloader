@@ -17,7 +17,7 @@ update:
 	make package-install
 
 lint:
-	poetry run flake8
+	@poetry run flake8
 
 push:
 	make lint
