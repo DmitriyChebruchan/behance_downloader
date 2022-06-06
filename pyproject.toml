@@ -11,6 +11,7 @@ packages = [
 python = "^3.10"
 flake8 = "^4.0.1"
 requests = "^2.27.1"
+pook = "^1.0.2"
 
 [tool.poetry.dev-dependencies]
 

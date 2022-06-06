@@ -24,7 +24,7 @@ def write_in_file(file_name, text):
         output_file.write(text)
 
 
-def download(address_to_put=None, address_of_site='https://google.com'):
+def download(address_of_site='https://google.com', address_to_put=None):
 
     r = requests.get(address_of_site)
 

@@ -10,7 +10,6 @@ install:
 package-install:
 	python3 -m pip install --force-reinstall --user dist/*.whl
 
-
 update:
 	make build
 	make publish
@@ -27,3 +26,6 @@ push:
 
 run:
 	poetry run page-loader https://google.com
+
+pytest:
+	poetry run pytest
