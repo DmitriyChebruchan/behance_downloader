@@ -3,3 +3,5 @@ dist
 poetry.lock
 __pycache__
 *.html
+.pytest_cache
+.DS_Store
