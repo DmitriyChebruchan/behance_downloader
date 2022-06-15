@@ -25,7 +25,7 @@ push:
 	git push
 
 run:
-	poetry run page-loader https://www.google.com
+	poetry run page-loader https://guides.hexlet.io/
 
 pytest:
 	poetry run pytest

@@ -33,49 +33,148 @@ def read_file(address):
         return f.read()
 
 
-def has_imgs(address):
+def has_related_files(address):
     text = read_file(address)
     soup = BeautifulSoup(text, 'html.parser')
-    tag = bool(soup.img)
+
+    scripts = soup.find_all("script", src=True)
+    css_links = soup.find_all("link", rel='stylesheet')
+    imgs = soup.find_all("img")
+
+    tag = any([scripts, css_links, imgs])
     return tag
 
 
-def list_imgs_related(address):
-    text = read_file(address)
-    soup = BeautifulSoup(text, 'html.parser')
-    src = [tag['src'] for tag in soup.find_all('img')]
-    return src
-
-
-def img_name_generator(dir, old_name):
-    new_name = old_name.split("/")[-1:][0]
-    new_name = '/'.join([dir, new_name])
+def name_generator(dir, old_name):
+    updated_name = old_name.split("/")[-1:][0]
+    new_name = '/'.join([dir, updated_name])
     return new_name
 
 
-def img_downloader(img_name, img_url):
-    img_data = requests.get(img_url).content
-    with open(img_name, 'wb') as handler:
-        handler.write(img_data)
+def dict_files_related(address):
+    result = {'imgs': [],
+              'scripts': [],
+              'css_link': []}
+    soup = BeautifulSoup(read_file(address), 'html.parser')
+
+    result['imgs'] = list_of_tags(soup, 'img', 'src')
+    result['scripts'] = [tag['src'] for tag in soup.find_all('script',
+                                                             src=True)]
+    result['css_link'] = [tag['href']
+                          for tag in soup.find_all('link', rel="stylesheet")]
+    return result
 
 
-def img_replaced_src(new_src, old_src, soup):
-    tag = soup.select('img[src="' + old_src + '"]')
+def list_of_tags(soup, the_tag, attr):
+    return [tag[attr] for tag in soup.find_all(the_tag)]
+
+
+def replaced_src(new_src, old_src, soup, file_format):
+    options = {'imgs': 'img',
+               'scripts': 'script',
+               'css_link': 'link'}
+    tag = soup.select(options.get(file_format) + '[src="' + old_src + '"]')
     tag[0]['src'] = new_src
     return soup
 
 
-def replace_url_of_imgs(file_name, updated_img_list_names, old_img_list_names):
+def replaced_href(new_src, old_src, soup):
+    tag = soup.select('link[href="' + old_src + '"]')
+    tag[0]['href'] = new_src
+    return soup
+
+
+def replace_src_of_element(file_name, updated_files_list_names,
+                           old_img_list_names, key):
     with open(file_name, 'r') as f:
         text = f.read()
 
     soup = BeautifulSoup(text, 'html.parser')
 
-    for new_src, old_src in zip(updated_img_list_names, old_img_list_names):
-        soup = img_replaced_src(new_src, old_src, soup)
+    for new_src, old_src in zip(updated_files_list_names, old_img_list_names):
+        soup = replaced_src(new_src, old_src, soup, key)
 
     with open(file_name, 'w') as output_file:
         output_file.write(str(soup))
+
+
+def replace_href_of_element(file_name, updated_files_list_names,
+                            old_img_list_names):
+    with open(file_name, 'r') as f:
+        text = f.read()
+
+    soup = BeautifulSoup(text, 'html.parser')
+
+    for new_src, old_src in zip(updated_files_list_names, old_img_list_names):
+        soup = replaced_href(new_src, old_src, soup)
+
+    with open(file_name, 'w') as output_file:
+        output_file.write(str(soup))
+
+
+def img_downloader(name, url):
+    data = requests.get(url).content
+    with open(name, 'wb') as handler:
+        handler.write(data)
+
+
+def script_downloader(name, url):
+    data = requests.get(url).content.decode("utf-8")
+    with open(name, 'w') as handler:
+        handler.write(data)
+    return
+
+
+def css_downloader(name, url):
+    data = requests.get(url).content.decode("utf-8")
+    with open(name, 'w') as handler:
+        handler.write(data)
+    return
+
+
+def download_supporting_files(addresses, urls, format):
+    option = {'imgs': img_downloader,
+              'scripts': script_downloader,
+              'css_link': css_downloader}
+
+    for name, url in zip(addresses, urls):
+        option.get(format)(name, url)
+
+
+def download_additional_files(file_name, dir, address_of_site):
+    dict_of_files = dict_files_related(file_name)
+
+    # dict with new names
+    dict_of_new_names = {}
+    for key, value in dict_of_files.items():
+        dict_of_new_names[key] = [name_generator(dir, x) for x in value]
+
+    # dict with urls
+    dict_of_files_urls_names = {}
+    for key, value in dict_of_files.items():
+        dict_of_files_urls_names[key] = list(map(lambda x: address_of_site + x,
+                                                 value))
+
+    # combined dict
+    combined_dict = {}
+    for key in dict_of_new_names:
+        combined_dict[key] = [dict_of_new_names[key],
+                              dict_of_files_urls_names[key]]
+
+    # downloadi_supporting_files
+    for key, lists in combined_dict.items():
+        download_supporting_files(*lists, key)
+
+    # replacing links in HTML file
+    replace_links(file_name, combined_dict, dict_of_files)
+
+
+def replace_links(file_name, combined_dict, dict_of_files):
+    for key, lists in combined_dict.items():
+        if key != 'css_link':
+            replace_src_of_element(file_name, lists[0], dict_of_files[key], key)
+        else:
+            replace_href_of_element(file_name, lists[0], dict_of_files[key])
 
 
 def download(address_of_site, address_to_put=None):
@@ -89,20 +188,15 @@ def download(address_of_site, address_to_put=None):
     file_name = create_file(address_to_put, address_of_site)
     write_in_file(file_name, r.text)
 
-    # check if file contains img
-    if has_imgs(file_name):
-        list_of_imgs = list_imgs_related(file_name)
+    # creating folder
+    dir = file_name[:-5] + "_files"
+    try:
+        os.mkdir(dir)
+    except FileExistsError:
+        pass
 
-        dir = file_name[:-5] + "_files"
-        # os.mkdir(dir)
-        updated_img_list_names = [img_name_generator(dir, x)
-                                  for x in list_of_imgs]
+    # check if file contains additional files for download
+    if has_related_files(file_name):
+        download_additional_files(file_name, dir, address_of_site)
 
-        urls_to_imgs = list(map(lambda x: address_of_site + x, list_of_imgs))
-
-        # downloading images in dir
-        for img_name, img_url in zip(updated_img_list_names, urls_to_imgs):
-            img_downloader(img_name, img_url)
-
-        replace_url_of_imgs(file_name, updated_img_list_names, list_of_imgs)
     return file_name
