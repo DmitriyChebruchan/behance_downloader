@@ -2,6 +2,8 @@
 import requests
 import os
 from bs4 import BeautifulSoup
+import logging
+from progress.bar import Bar
 
 
 def url_to_file_name(url):
@@ -43,6 +45,18 @@ def has_related_files(address):
 
     tag = any([scripts, css_links, imgs])
     return tag
+
+
+def quantity_related_files(address):
+    text = read_file(address)
+    soup = BeautifulSoup(text, 'html.parser')
+
+    scripts = soup.find_all("script", src=True)
+    css_links = soup.find_all("link", rel='stylesheet')
+    imgs = soup.find_all("img")
+
+    quantity = len(scripts + css_links + imgs)
+    return quantity
 
 
 def name_generator(dir, old_name):
@@ -179,7 +193,9 @@ def replace_links(file_name, combined_dict, dict_of_files):
 
 def download(address_of_site, address_to_put=None):
 
+    logging.warning('sending request to {}'.format(address_of_site))
     r = requests.get(address_of_site)
+    logging.warning('reply received')
 
     if address_to_put is None:
         address_to_put = os.getcwd()
@@ -187,6 +203,7 @@ def download(address_of_site, address_to_put=None):
     # creating HTML file
     file_name = create_file(address_to_put, address_of_site)
     write_in_file(file_name, r.text)
+    logging.warning('HTML file created')
 
     # creating folder
     dir = file_name[:-5] + "_files"
@@ -194,9 +211,16 @@ def download(address_of_site, address_to_put=None):
         os.mkdir(dir)
     except FileExistsError:
         pass
+    logging.warning('folder created or exists')
 
     # check if file contains additional files for download
     if has_related_files(file_name):
-        download_additional_files(file_name, dir, address_of_site)
+        quantity = quantity_related_files(file_name)
+        bar = Bar('Processing', max=quantity)
+        for i in range(quantity):
+            download_additional_files(file_name, dir, address_of_site)
+            bar.next()
+        bar.finish()
+    logging.warning('files downloaded')
 
     return file_name
