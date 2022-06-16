@@ -175,6 +175,7 @@ def download_additional_files(file_name, dir, address_of_site):
         combined_dict[key] = [dict_of_new_names[key],
                               dict_of_files_urls_names[key]]
 
+    # download files
     quantity = quantity_related_files(file_name)
     bar = Bar('Processing', max=quantity)
     for i in range(quantity):
@@ -196,6 +197,8 @@ def replace_links(file_name, combined_dict, dict_of_files):
 
 
 def download(address_of_site, address_to_put=None):
+    logging.warning('Address of site is {}'.format(address_of_site))
+    logging.warning('Folder to put is {}'.fomat(address_to_put))
 
     logging.warning('sending request to {}'.format(address_of_site))
     r = requests.get(address_of_site)
@@ -223,12 +226,7 @@ def download(address_of_site, address_to_put=None):
 
     # check if file contains additional files for download
     if has_related_files(file_name):
-        # quantity = quantity_related_files(file_name)
-        # bar = Bar('Processing', max=quantity)
-        # for i in range(quantity):
         download_additional_files(file_name, dir, address_of_site)
-        #     bar.next()
-        # bar.finish()
     logging.warning('files downloaded')
 
     return file_name
