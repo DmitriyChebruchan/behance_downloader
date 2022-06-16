@@ -175,9 +175,13 @@ def download_additional_files(file_name, dir, address_of_site):
         combined_dict[key] = [dict_of_new_names[key],
                               dict_of_files_urls_names[key]]
 
-    # downloadi_supporting_files
-    for key, lists in combined_dict.items():
-        download_supporting_files(*lists, key)
+    quantity = quantity_related_files(file_name)
+    bar = Bar('Processing', max=quantity)
+    for i in range(quantity):
+        for key, lists in combined_dict.items():
+            download_supporting_files(*lists, key)
+        bar.next()
+    bar.finish()
 
     # replacing links in HTML file
     replace_links(file_name, combined_dict, dict_of_files)
@@ -195,6 +199,10 @@ def download(address_of_site, address_to_put=None):
 
     logging.warning('sending request to {}'.format(address_of_site))
     r = requests.get(address_of_site)
+    status_code = r.status_code
+    if r.status_code != 200:
+        raise Warning('Statu_code is {}'.format(status_code))
+
     logging.warning('reply received')
 
     if address_to_put is None:
@@ -215,12 +223,12 @@ def download(address_of_site, address_to_put=None):
 
     # check if file contains additional files for download
     if has_related_files(file_name):
-        quantity = quantity_related_files(file_name)
-        bar = Bar('Processing', max=quantity)
-        for i in range(quantity):
-            download_additional_files(file_name, dir, address_of_site)
-            bar.next()
-        bar.finish()
+        # quantity = quantity_related_files(file_name)
+        # bar = Bar('Processing', max=quantity)
+        # for i in range(quantity):
+        download_additional_files(file_name, dir, address_of_site)
+        #     bar.next()
+        # bar.finish()
     logging.warning('files downloaded')
 
     return file_name
