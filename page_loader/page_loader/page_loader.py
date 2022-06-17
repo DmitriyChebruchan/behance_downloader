@@ -136,6 +136,7 @@ def img_downloader(name, url):
 
     with open(name, 'wb') as handler:
         handler.write(data)
+    logging.warning('IMG file {} was downloader'.format(name))
 
 
 def script_downloader(name, url):
@@ -148,6 +149,7 @@ def script_downloader(name, url):
 
     with open(name, 'w') as handler:
         handler.write(data)
+    logging.warning('Script file {} was downloader'.format(name))
     return
 
 
@@ -161,6 +163,7 @@ def css_downloader(name, url):
 
     with open(name, 'w') as handler:
         handler.write(data)
+    logging.warning('CSS file {} was downloader'.format(name))
     return
 
 
@@ -168,8 +171,10 @@ def download_supporting_files(addresses, urls, format):
     option = {'imgs': img_downloader,
               'scripts': script_downloader,
               'css_link': css_downloader}
-
+    logging.warning('List of files for download: \n' + str(addresses))
     for name, url in zip(addresses, urls):
+        logging.warning('File {} will be downloaded from url {}'.format(name,
+                                                                        url))
         option.get(format)(name, url)
 
 
