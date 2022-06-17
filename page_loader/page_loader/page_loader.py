@@ -127,15 +127,20 @@ def replace_href_of_element(file_name, updated_files_list_names,
 
 
 def img_downloader(name, url):
+    logging.warning('File {} is planned to be downloaded from {}'.format(
+        name, url))
     data = requests.get(url).content
 
     # checking for cerrect reply
     status_code = data.status_code
-    if status_code != 200:
+    logging.warning('Status_code is {}'.format(status_code))
+    if data.status_code != 200:
         raise Warning('Status_code is {}'.format(status_code))
 
     with open(name, 'wb') as handler:
+        logging.warning('File war opened')
         handler.write(data)
+        logging.warning('File war written')
     logging.warning('IMG file {} was downloaded'.format(name))
 
 
