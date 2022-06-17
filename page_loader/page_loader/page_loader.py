@@ -198,7 +198,7 @@ def replace_links(file_name, combined_dict, dict_of_files):
 
 def download(address_of_site, address_to_put=None):
     logging.warning('Address of site is {}'.format(address_of_site))
-    logging.warning('Folder to put is {}'.fomat(address_to_put))
+    logging.warning('Folder to put is {}'.format(address_to_put))
 
     logging.warning('sending request to {}'.format(address_of_site))
     r = requests.get(address_of_site)
