@@ -128,12 +128,24 @@ def replace_href_of_element(file_name, updated_files_list_names,
 
 def img_downloader(name, url):
     data = requests.get(url).content
+
+    # checking for cerrect reply
+    status_code = data.status_code
+    if status_code != 200:
+        raise Warning('Status_code is {}'.format(status_code))
+
     with open(name, 'wb') as handler:
         handler.write(data)
 
 
 def script_downloader(name, url):
     data = requests.get(url).content.decode("utf-8")
+
+    # checking for cerrect reply
+    status_code = data.status_code
+    if status_code != 200:
+        raise Warning('Status_code is {}'.format(status_code))
+
     with open(name, 'w') as handler:
         handler.write(data)
     return
@@ -141,6 +153,12 @@ def script_downloader(name, url):
 
 def css_downloader(name, url):
     data = requests.get(url).content.decode("utf-8")
+
+    # checking for cerrect reply
+    status_code = data.status_code
+    if status_code != 200:
+        raise Warning('Status_code is {}'.format(status_code))
+
     with open(name, 'w') as handler:
         handler.write(data)
     return
@@ -203,8 +221,8 @@ def download(address_of_site, address_to_put=None):
     logging.warning('sending request to {}'.format(address_of_site))
     r = requests.get(address_of_site)
     status_code = r.status_code
-    if r.status_code != 200:
-        raise Warning('Statu_code is {}'.format(status_code))
+    if status_code != 200:
+        raise Warning('Status_code is {}'.format(status_code))
 
     logging.warning('reply received')
 
