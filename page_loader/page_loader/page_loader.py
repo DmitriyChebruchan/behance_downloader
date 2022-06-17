@@ -129,7 +129,10 @@ def replace_href_of_element(file_name, updated_files_list_names,
 def img_downloader(name, url):
     logging.warning('File {} is planned to be downloaded from {}'.format(
         name, url))
-    data = requests.get(url).content
+    try:
+        data = requests.get(url).content
+    except TypeError:
+        raise Warning('Url {} can not return data'.format(url))
 
     # checking for cerrect reply
     status_code = data.status_code
@@ -145,7 +148,10 @@ def img_downloader(name, url):
 
 
 def script_downloader(name, url):
-    data = requests.get(url).content.decode("utf-8")
+    try:
+        data = requests.get(url).content.decode("utf-8")
+    except TypeError:
+        raise Warning('Url {} can not return data'.format(url))
 
     # checking for cerrect reply
     status_code = data.status_code
@@ -159,7 +165,10 @@ def script_downloader(name, url):
 
 
 def css_downloader(name, url):
-    data = requests.get(url).content.decode("utf-8")
+    try:
+        data = requests.get(url).content.decode("utf-8")
+    except TypeError:
+        raise Warning('Url {} can not return data'.format(url))
 
     # checking for cerrect reply
     status_code = data.status_code
