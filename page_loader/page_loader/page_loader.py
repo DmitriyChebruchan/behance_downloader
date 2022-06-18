@@ -199,20 +199,21 @@ def url_generator(web_site, name):
     logging.info('name of file is {}'.format(name))
 
     if name[:4] == 'http':
-        result = name
+        logging.info('result of combination is {}'.format(name))
+        return name
     if name[0] != '/':
         host_name = urlparse(web_site).hostname
         logging.info('host name is {}'.format(host_name))
-        result = host_name + name
+        logging.info('result of combination is {}'.format(host_name + name))
+        return host_name + name
     else:
-        result = web_site + name
-    logging.info('result of combination is {}'.format(result))
-    return result
+        logging.info('result of combination is {}'.format(web_site + name))
+        return web_site + name
 
 
 def download_additional_files(file_name, dir, address_of_site):
     dict_of_files = dict_files_related(file_name)
-    logging.info('dict of files is {}'.format(dict_files_related))
+    logging.info('dict of files is {}'.format(str(dict_files_related)))
 
     # dict with new names
     dict_of_new_names = {}
