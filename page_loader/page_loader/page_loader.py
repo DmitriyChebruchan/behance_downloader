@@ -135,6 +135,12 @@ def img_downloader(name, url):
     except TypeError:
         raise Warning('Url {} can not return data'.format(url))
 
+    # checking for cerrect reply
+    status_code = data.decode("utf-8").status_code
+    logging.info('Status_code is {}'.format(status_code))
+    if data.status_code != 200:
+        raise Warning('Status_code is {}'.format(status_code))
+
     with open(name, 'wb') as handler:
         logging.info('File war opened')
         handler.write(data)
