@@ -201,7 +201,7 @@ def url_generator(web_site, name):
     if name[:4] == 'http':
         logging.info('result of combination is {}'.format(name))
         return name
-    if name[0] != '/':
+    if name[0] == '/':
         host_name = urlparse(web_site).hostname
         logging.info('host name is {}'.format(host_name))
         logging.info('result of combination is {}'.format(host_name + name))
