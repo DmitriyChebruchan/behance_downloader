@@ -193,6 +193,16 @@ def download_supporting_files(addresses, urls, format):
         option.get(format)(name, url)
 
 
+def url_generator(web_site, name):
+    logging.info('web site is {}'.format(web_site))
+    logging.info('nome of file is {}'.format(name))
+    if name[0] != '/':
+        result = web_site + name
+    else:
+        result = web_site + name
+    return result
+
+
 def download_additional_files(file_name, dir, address_of_site):
     dict_of_files = dict_files_related(file_name)
     logging.warning('dict of files is {}'.format(dict_files_related))
@@ -205,8 +215,9 @@ def download_additional_files(file_name, dir, address_of_site):
     # dict with urls
     dict_of_files_urls_names = {}
     for key, value in dict_of_files.items():
-        dict_of_files_urls_names[key] = list(map(lambda x: address_of_site + x,
-                                                 value))
+        dict_of_files_urls_names[key] = list(map(lambda x:
+                                                 url_generator(address_of_site,
+                                                               x), value))
 
     # combined dict
     combined_dict = {}
