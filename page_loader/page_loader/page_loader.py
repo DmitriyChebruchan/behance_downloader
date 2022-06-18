@@ -4,6 +4,7 @@ import os
 from bs4 import BeautifulSoup
 import logging
 from progress.bar import Bar
+from urllib.parse import urlparse
 
 
 def url_to_file_name(url):
@@ -196,8 +197,12 @@ def download_supporting_files(addresses, urls, format):
 def url_generator(web_site, name):
     logging.info('web site is {}'.format(web_site))
     logging.info('name of file is {}'.format(name))
+
+    if name[:4] == 'http':
+        result = name
     if name[0] != '/':
-        result = web_site + name
+        host_name = urlparse(web_site).hostname
+        result = host_name + name
     else:
         result = web_site + name
     logging.info('result of combination is {}'.format(result))
