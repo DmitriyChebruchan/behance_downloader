@@ -202,11 +202,10 @@ def url_generator(web_site, name):
         logging.info('result of combination is {}'.format(name))
         return name
     if name[0] == '/':
-        site_base = urlparse(web_site).scheme + "://"
-        + urlparse(web_site).hostname
-        logging.info('host name is {}'.format(site_base))
-        logging.info('result of combination is {}'.format(site_base + name))
-        return site_base + name
+        site = urlparse(web_site).scheme + "://" + urlparse(web_site).hostname
+        logging.info('host name is {}'.format(site))
+        logging.info('result of combination is {}'.format(site + name))
+        return site + name
     else:
         logging.info('result of combination is {}'.format(web_site + name))
         return web_site + name
