@@ -127,7 +127,7 @@ def replace_href_of_element(file_name, updated_files_list_names,
 
 
 def img_downloader(name, url):
-    logging.warning('File {} is planned to be downloaded from {}'.format(
+    logging.ingo('File {} is planned to be downloaded from {}'.format(
         name, url))
     try:
         data = requests.get(url).content
@@ -136,15 +136,15 @@ def img_downloader(name, url):
 
     # checking for cerrect reply
     status_code = data.status_code
-    logging.warning('Status_code is {}'.format(status_code))
+    logging.ingo('Status_code is {}'.format(status_code))
     if data.status_code != 200:
         raise Warning('Status_code is {}'.format(status_code))
 
     with open(name, 'wb') as handler:
-        logging.warning('File war opened')
+        logging.ingo('File war opened')
         handler.write(data)
-        logging.warning('File war written')
-    logging.warning('IMG file {} was downloaded'.format(name))
+        logging.ingo('File war written')
+    logging.ingo('IMG file {} was downloaded'.format(name))
 
 
 def script_downloader(name, url):
@@ -160,7 +160,7 @@ def script_downloader(name, url):
 
     with open(name, 'w') as handler:
         handler.write(data)
-    logging.warning('Script file {} was downloaded'.format(name))
+    logging.ingo('Script file {} was downloaded'.format(name))
     return
 
 
@@ -177,7 +177,7 @@ def css_downloader(name, url):
 
     with open(name, 'w') as handler:
         handler.write(data)
-    logging.warning('CSS file {} was downloaded'.format(name))
+    logging.ingo('CSS file {} was downloaded'.format(name))
     return
 
 
@@ -185,11 +185,11 @@ def download_supporting_files(addresses, urls, format):
     option = {'imgs': img_downloader,
               'scripts': script_downloader,
               'css_link': css_downloader}
-    logging.warning('List of files for download: \n' + str(addresses))
+    logging.ingo('List of files for download: \n' + str(addresses))
     for name, url in zip(addresses, urls):
         line = 'File {} with format {} will be downloaded from url {}'.format(
             name, format, url)
-        logging.warning(line)
+        logging.ingo(line)
         option.get(format)(name, url)
 
 
@@ -200,12 +200,13 @@ def url_generator(web_site, name):
         result = web_site + name
     else:
         result = web_site + name
+    logging.ingo('result of combination is {}'.format(result))
     return result
 
 
 def download_additional_files(file_name, dir, address_of_site):
     dict_of_files = dict_files_related(file_name)
-    logging.warning('dict of files is {}'.format(dict_files_related))
+    logging.ingo('dict of files is {}'.format(dict_files_related))
 
     # dict with new names
     dict_of_new_names = {}
@@ -247,16 +248,16 @@ def replace_links(file_name, combined_dict, dict_of_files):
 
 
 def download(address_of_site, address_to_put=None):
-    logging.warning('Address of site is {}'.format(address_of_site))
-    logging.warning('Folder to put is {}'.format(address_to_put))
+    logging.ingo('Address of site is {}'.format(address_of_site))
+    logging.ingo('Folder to put is {}'.format(address_to_put))
 
-    logging.warning('sending request to {}'.format(address_of_site))
+    logging.ingo('sending request to {}'.format(address_of_site))
     r = requests.get(address_of_site)
     status_code = r.status_code
     if status_code != 200:
         raise Warning('Status_code is {}'.format(status_code))
 
-    logging.warning('reply received')
+    logging.ingo('reply received')
 
     if address_to_put is None:
         address_to_put = os.getcwd()
@@ -264,7 +265,7 @@ def download(address_of_site, address_to_put=None):
     # creating HTML file
     file_name = create_file(address_to_put, address_of_site)
     write_in_file(file_name, r.text)
-    logging.warning('HTML file created')
+    logging.ingo('HTML file created')
 
     # creating folder
     dir = file_name[:-5] + "_files"
@@ -272,11 +273,11 @@ def download(address_of_site, address_to_put=None):
         os.mkdir(dir)
     except FileExistsError:
         pass
-    logging.warning('folder created or exists')
+    logging.ingo('folder created or exists')
 
     # check if file contains additional files for download
     if has_related_files(file_name):
         download_additional_files(file_name, dir, address_of_site)
-    logging.warning('files downloaded')
+    logging.ingo('files downloaded')
 
     return file_name
