@@ -195,6 +195,7 @@ def download_supporting_files(addresses, urls, format):
 
 def download_additional_files(file_name, dir, address_of_site):
     dict_of_files = dict_files_related(file_name)
+    logging.warning('dict of files is {}'.format(dict_files_related))
 
     # dict with new names
     dict_of_new_names = {}
