@@ -202,6 +202,7 @@ def url_generator(web_site, name):
         result = name
     if name[0] != '/':
         host_name = urlparse(web_site).hostname
+        logging.ingo('host name is {}'.format(host_name))
         result = host_name + name
     else:
         result = web_site + name
