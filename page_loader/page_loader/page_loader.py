@@ -130,21 +130,24 @@ def replace_href_of_element(file_name, updated_files_list_names,
 def img_downloader(name, url):
     logging.info('File {} is planned to be downloaded from {}'.format(
         name, url))
+
+    # checking if url works
     try:
         data = requests.get(url).content
     except TypeError:
         raise Warning('Url {} can not return data'.format(url))
 
-    # checking for cerrect reply
-    status_code = data.decode("utf-8").status_code
-    logging.info('Status_code is {}'.format(status_code))
-    if data.status_code != 200:
-        raise Warning('Status_code is {}'.format(status_code))
+    # # checking for cerrect reply
+    # status_code = data.decode("utf-8").status_code
+    # logging.info('Status_code is {}'.format(status_code))
+    # if data.status_code != 200:
+    #     raise Warning('Status_code is {}'.format(status_code))
 
+    # writing files
     with open(name, 'wb') as handler:
-        logging.info('File war opened')
+        logging.info('File was opened')
         handler.write(data)
-        logging.info('File war written')
+        logging.info('File was written')
     logging.info('IMG file {} was downloaded'.format(name))
 
 

@@ -9,7 +9,7 @@ def test_page_loader_no_adress_to_put():
     address = 'https://guides.hexlet.io/'
 
     # fixture result HTML
-    file = open('./tests/fixtures/results/guides_hexlet_io.txt', 'r')
+    file = open('./tests/fixtures/results/result_2/guides_hexlet_io.txt', 'r')
     expected_result = file.read()
 
     # pook responce for HTML-file
