@@ -15,17 +15,18 @@ update:
 	make publish
 	make package-install
 
+pytest:
+	poetry run pytest
+
 lint:
 	@poetry run flake8
 
 push:
 	make lint
+	make pytest
 	git add .
 	git commit -m '$(M)'
 	git push
 
 run:
 	poetry run page-loader https://guides.hexlet.io/
-
-pytest:
-	poetry run pytest

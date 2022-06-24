@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
 import requests
 import os
-from bs4 import BeautifulSoup
 import logging
+from bs4 import BeautifulSoup
 from progress.bar import Bar
 from urllib.parse import urlparse
-
-
-def url_to_file_name(url):
-    url = url.replace('https://', '')
-    url = url.replace('http://', '')
-    url = url.replace('.', '-') + '.html'
-    url = url.replace('/', '-')
-    return url
+from page_loader.additionals.replacers import url_to_file_name, \
+    replace_href_of_element, replace_src_of_element
+from page_loader.additionals.additional_files_downloader import\
+    download_supporting_files
+from page_loader.additionals.additional_functions import \
+    quantity_related_files, read_file
 
 
 def create_file(address, url):
@@ -28,12 +26,8 @@ def write_in_file(file_name, text):
     soup = BeautifulSoup(text, 'html.parser').prettify()
     with open(file_name, 'w') as output_file:
         output_file.write(soup)
-
-
-# returns text of file
-def read_file(address):
-    with open(address, 'r') as f:
-        return f.read()
+    logging.info('HTML file created')
+    logging.info('HTML file is {}'.format(soup))
 
 
 def has_related_files(address):
@@ -46,18 +40,6 @@ def has_related_files(address):
 
     tag = any([scripts, css_links, imgs])
     return tag
-
-
-def quantity_related_files(address):
-    text = read_file(address)
-    soup = BeautifulSoup(text, 'html.parser')
-
-    scripts = soup.find_all("script", src=True)
-    css_links = soup.find_all("link", rel='stylesheet')
-    imgs = soup.find_all("img")
-
-    quantity = len(scripts + css_links + imgs)
-    return quantity
 
 
 def name_generator(dir, old_name):
@@ -85,117 +67,6 @@ def dict_files_related(address):
 
 def list_of_tags(soup, the_tag, attr):
     return [tag[attr] for tag in soup.find_all(the_tag)]
-
-
-def replaced_src(new_src, old_src, soup, file_format):
-    options = {'imgs': 'img',
-               'scripts': 'script',
-               'css_link': 'link'}
-    tag = soup.select(options.get(file_format) + '[src="' + old_src + '"]')
-    tag[0]['src'] = new_src
-    return soup
-
-
-def replaced_href(new_src, old_src, soup):
-    tag = soup.select('link[href="' + old_src + '"]')
-    tag[0]['href'] = new_src
-    return soup
-
-
-def replace_src_of_element(file_name, updated_files_list_names,
-                           old_img_list_names, key):
-    with open(file_name, 'r') as f:
-        text = f.read()
-
-    soup = BeautifulSoup(text, 'html.parser')
-
-    for new_src, old_src in zip(updated_files_list_names, old_img_list_names):
-        soup = replaced_src(new_src, old_src, soup, key)
-
-    with open(file_name, 'w') as output_file:
-        output_file.write(str(soup))
-
-
-def replace_href_of_element(file_name, updated_files_list_names,
-                            old_img_list_names):
-    with open(file_name, 'r') as f:
-        text = f.read()
-
-    soup = BeautifulSoup(text, 'html.parser')
-
-    for new_src, old_src in zip(updated_files_list_names, old_img_list_names):
-        soup = replaced_href(new_src, old_src, soup)
-
-    with open(file_name, 'w') as output_file:
-        output_file.write(str(soup))
-
-
-def img_downloader(name, url):
-    logging.info('File {} is planned to be downloaded from {}'.format(
-        name, url))
-
-    # checking if url works
-    try:
-        data = requests.get(url).content
-    except TypeError:
-        raise Warning('Url {} can not return data'.format(url))
-
-    # writing files
-    with open(name, 'wb') as handler:
-        handler.write(data)
-    logging.info('IMG file {} was downloaded'.format(name))
-
-
-def script_downloader(name, url):
-    logging.info('File {} is planned to be downloaded from {}'.format(
-        name, url))
-    try:
-        data = requests.get(url).content
-    except TypeError:
-        raise Warning('Url {} can not return data'.format(url))
-
-    # # checking for cerrect reply
-    # status_code = data.status_code
-    # if status_code != 200:
-    #     raise Warning('Status_code is {}'.format(status_code))
-
-    with open(name, 'w') as handler:
-        handler.write(data)
-
-    logging.info('Script file {} was downloaded'.format(name))
-
-
-def css_downloader(name, url):
-    logging.info('File {} is planned to be downloaded from {}.'.format(
-        name, url))
-    try:
-        data = requests.get(url).content
-    except TypeError:
-        raise Warning('Url {} can not return data'.format(url))
-
-    # checking for cerrect reply
-    status_code = data.status_code
-    if status_code != 200:
-        raise Warning('Status_code is {}'.format(status_code))
-
-    with open(name, 'w') as handler:
-        handler.write(data)
-    logging.info('CSS file {} was downloaded'.format(name))
-
-
-def download_supporting_files(addresses, urls, format):
-    option = {'imgs': img_downloader,
-              'scripts': script_downloader,
-              'css_link': css_downloader}
-    logging.info('List of files for download: \n' + str(addresses))
-    for name, url in zip(addresses, urls):
-        line = 'File {} with format {} will be downloaded from url {}'.format(
-            name, format, url)
-        logging.info(line)
-        if option.get(format) is None:
-            logging('Format of file is not correct.')
-            return
-        option.get(format)(name, url)
 
 
 def url_generator(web_site, name):
@@ -278,7 +149,6 @@ def download(address_of_site, address_to_put=None):
     # creating HTML file
     file_name = create_file(address_to_put, address_of_site)
     write_in_file(file_name, r.text)
-    logging.info('HTML file created')
 
     # creating folder
     dir = file_name[:-5] + "_files"
