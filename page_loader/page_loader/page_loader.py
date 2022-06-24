@@ -132,7 +132,19 @@ def img_downloader(name, url):
         name, url))
 
     # checking if url works
-    print('File {} is planned to be downloaded from {}'.format(
+    try:
+        data = requests.get(url).content
+    except TypeError:
+        raise Warning('Url {} can not return data'.format(url))
+
+    # writing files
+    with open(name, 'wb') as handler:
+        handler.write(data)
+    logging.info('IMG file {} was downloaded'.format(name))
+
+
+def script_downloader(name, url):
+    logging.info('File {} is planned to be downloaded from {}.'.format(
         name, url))
     try:
         data = requests.get(url).content
@@ -140,39 +152,21 @@ def img_downloader(name, url):
         raise Warning('Url {} can not return data'.format(url))
 
     # # checking for cerrect reply
-    # status_code = data.decode("utf-8").status_code
-    # logging.info('Status_code is {}'.format(status_code))
-    # if data.status_code != 200:
+    # status_code = data.status_code
+    # if status_code != 200:
     #     raise Warning('Status_code is {}'.format(status_code))
-
-    # writing files
-    with open(name, 'wb') as handler:
-        logging.info('File was opened')
-        handler.write(data)
-        logging.info('File was written')
-    logging.info('IMG file {} was downloaded'.format(name))
-
-
-def script_downloader(name, url):
-    try:
-        data = requests.get(url).content.decode("utf-8")
-    except TypeError:
-        raise Warning('Url {} can not return data'.format(url))
-
-    # checking for cerrect reply
-    status_code = data.status_code
-    if status_code != 200:
-        raise Warning('Status_code is {}'.format(status_code))
 
     with open(name, 'w') as handler:
         handler.write(data)
+
     logging.info('Script file {} was downloaded'.format(name))
-    return
 
 
 def css_downloader(name, url):
+    logging.info('File {} is planned to be downloaded from {}.'.format(
+        name, url))
     try:
-        data = requests.get(url).content.decode("utf-8")
+        data = requests.get(url).content
     except TypeError:
         raise Warning('Url {} can not return data'.format(url))
 
@@ -184,7 +178,6 @@ def css_downloader(name, url):
     with open(name, 'w') as handler:
         handler.write(data)
     logging.info('CSS file {} was downloaded'.format(name))
-    return
 
 
 def download_supporting_files(addresses, urls, format):
