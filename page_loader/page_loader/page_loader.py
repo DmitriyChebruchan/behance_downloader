@@ -5,8 +5,7 @@ import logging
 from bs4 import BeautifulSoup
 from progress.bar import Bar
 from urllib.parse import urlparse
-from page_loader.additionals.replacers import url_to_file_name, \
-    replace_href_of_element, replace_src_of_element
+from page_loader.additionals.replacers import url_to_file_name, replace_links
 from page_loader.additionals.additional_files_downloader import\
     download_supporting_files
 from page_loader.additionals.additional_functions import \
@@ -50,8 +49,9 @@ def dict_files_related(address):
                                                              src=True)]
     result['css_link'] = [tag['href']
                           for tag in soup.find_all('link', rel="stylesheet")]
+
     for lst in result.values():
-        lst = map(filter_foreign_source, lst)
+        lst = list(filter(filter_foreign_source, lst))
 
     logging.info('List of parsed imgs:\n{}'.format(result['imgs']))
     logging.info('List of parsed scripts:\n{}'.format(result['scripts']))
@@ -59,10 +59,10 @@ def dict_files_related(address):
     return result
 
 
-def filter_foreign_source(lst):
-    lst = list(filter(lambda tag: tag if tag['src'][:3] != 'http' else False,
-                      lst))
-    return lst
+def filter_foreign_source(address):
+    if address[:4] == 'http':
+        logging.ingo('address {} is planned to be deleted.'.format(address))
+    return True if address[:4] != 'http' else False
 
 
 def list_of_tags(soup, the_tag, attr):
@@ -121,14 +121,6 @@ def download_additional_files(file_name, dir, address_of_site):
 
     # replacing links in HTML file
     replace_links(file_name, combined_dict, dict_of_files)
-
-
-def replace_links(file_name, combined_dict, dict_of_files):
-    for key, lists in combined_dict.items():
-        if key != 'css_link':
-            replace_src_of_element(file_name, lists[0], dict_of_files[key], key)
-        else:
-            replace_href_of_element(file_name, lists[0], dict_of_files[key])
 
 
 def download(address_of_site, address_to_put=None):

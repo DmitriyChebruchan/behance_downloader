@@ -39,7 +39,7 @@ def script_downloader(name, url):
 
     # checking if url works
     try:
-        data = requests.get(url).content
+        data = requests.get(url).content.decode('utf-8')
     except TypeError:
         raise Warning('Url {} can not return data'.format(url))
 
@@ -53,14 +53,14 @@ def css_downloader(name, url):
     logging.info('File {} is planned to be downloaded from {}.'.format(
         name, url))
     try:
-        data = requests.get(url).content
+        data = requests.get(url).content.decode('utf-8')
     except TypeError:
         raise Warning('Url {} can not return data'.format(url))
 
     # checking for cerrect reply
-    status_code = data.status_code
-    if status_code != 200:
-        raise Warning('Status_code is {}'.format(status_code))
+    # status_code = data.status_code
+    # if status_code != 200:
+    #     raise Warning('Status_code is {}'.format(status_code))
 
     with open(name, 'w') as handler:
         handler.write(data)

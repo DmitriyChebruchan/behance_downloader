@@ -1,6 +1,14 @@
 from bs4 import BeautifulSoup
 
 
+def replace_links(file_name, combined_dict, dict_of_files):
+    for key, lists in combined_dict.items():
+        if key != 'css_link':
+            replace_src_of_element(file_name, lists[0], dict_of_files[key], key)
+        else:
+            replace_href_of_element(file_name, lists[0], dict_of_files[key])
+
+
 def url_to_file_name(url):
     url = url.replace('https://', '')
     url = url.replace('http://', '')
