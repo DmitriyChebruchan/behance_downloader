@@ -6,16 +6,17 @@ import pook
 # tests if folder to put file in is None
 @pook.on
 def test_page_loader_no_adress_to_put():
+
     address = 'https://guides.hexlet.io/'
 
     # fixture result HTML
-    file = open('./tests/fixtures/results/result_2/guides_hexlet_io.txt', 'r')
+    file = open('./tests/fixtures/results/result_1/guides_hexlet_io.html', 'r')
     expected_result = file.read()
 
     # pook responce for HTML-file
     pook.get(
         address,
-        reply=404,
+        reply=200,
         response_json=expected_result
     )
 
@@ -35,14 +36,14 @@ def test_page_loader_with_adress_to_put():
 
     address = 'https://guides.hexlet.io/'
 
-    # fixture result
-    file = open('./tests/fixtures/results/guides_hexlet_io.txt', 'r')
+    # fixture HTML result
+    file = open('./tests/fixtures/results/result_1/guides_hexlet_io.html', 'r')
     expected_result = file.read()
 
     # pook responce
     pook.get(
         address,
-        reply=404,
+        reply=200,
         response_json=expected_result
     )
 

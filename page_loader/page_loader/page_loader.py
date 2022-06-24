@@ -132,6 +132,8 @@ def img_downloader(name, url):
         name, url))
 
     # checking if url works
+    print('File {} is planned to be downloaded from {}'.format(
+        name, url))
     try:
         data = requests.get(url).content
     except TypeError:
