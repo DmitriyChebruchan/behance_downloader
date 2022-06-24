@@ -3,10 +3,10 @@ import logging
 
 
 def download_supporting_files(addresses, urls, format):
+    logging.info('List of files for download: \n' + str(addresses))
     option = {'imgs': img_downloader,
               'scripts': script_downloader,
               'css_link': css_downloader}
-    logging.info('List of files for download: \n' + str(addresses))
     for name, url in zip(addresses, urls):
         line = 'File {} with format {} will be downloaded from url {}'.format(
             name, format, url)
@@ -36,15 +36,12 @@ def img_downloader(name, url):
 def script_downloader(name, url):
     logging.info('File {} is planned to be downloaded from {}'.format(
         name, url))
+
+    # checking if url works
     try:
         data = requests.get(url).content
     except TypeError:
         raise Warning('Url {} can not return data'.format(url))
-
-    # # checking for cerrect reply
-    # status_code = data.status_code
-    # if status_code != 200:
-    #     raise Warning('Status_code is {}'.format(status_code))
 
     with open(name, 'w') as handler:
         handler.write(data)

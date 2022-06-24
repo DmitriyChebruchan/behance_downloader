@@ -10,7 +10,7 @@ from page_loader.additionals.replacers import url_to_file_name, \
 from page_loader.additionals.additional_files_downloader import\
     download_supporting_files
 from page_loader.additionals.additional_functions import \
-    quantity_related_files, read_file
+    quantity_related_files, read_file, write_in_file
 
 
 def create_file(address, url):
@@ -19,15 +19,6 @@ def create_file(address, url):
     f = open(name_of_file, "w")
     f.close()
     return name_of_file
-
-
-# placing prettified text in HTML file
-def write_in_file(file_name, text):
-    soup = BeautifulSoup(text, 'html.parser').prettify()
-    with open(file_name, 'w') as output_file:
-        output_file.write(soup)
-    logging.info('HTML file created')
-    logging.info('HTML file is {}'.format(soup))
 
 
 def has_related_files(address):
@@ -59,10 +50,19 @@ def dict_files_related(address):
                                                              src=True)]
     result['css_link'] = [tag['href']
                           for tag in soup.find_all('link', rel="stylesheet")]
+    for lst in result.values():
+        lst = map(filter_foreign_source, lst)
+
     logging.info('List of parsed imgs:\n{}'.format(result['imgs']))
     logging.info('List of parsed scripts:\n{}'.format(result['scripts']))
     logging.info('List of parsed css links:\n{}'.format(result['css_link']))
     return result
+
+
+def filter_foreign_source(lst):
+    lst = list(filter(lambda tag: tag if tag['src'][:3] != 'http' else False,
+                      lst))
+    return lst
 
 
 def list_of_tags(soup, the_tag, attr):

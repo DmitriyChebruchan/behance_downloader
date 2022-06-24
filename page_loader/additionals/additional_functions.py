@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+import logging
 
 
 # returns text of file
@@ -28,3 +29,12 @@ def name_generator(dir, old_name):
     updated_name = old_name.split("/")[-1:][0]
     new_name = '/'.join([dir, updated_name])
     return new_name
+
+
+# placing prettified text in HTML file
+def write_in_file(file_name, text):
+    soup = BeautifulSoup(text, 'html.parser').prettify()
+    with open(file_name, 'w') as output_file:
+        output_file.write(soup)
+    logging.info('HTML file created')
+    logging.info('HTML file is \n{}'.format(soup))
