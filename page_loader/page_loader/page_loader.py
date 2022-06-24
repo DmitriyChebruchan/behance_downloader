@@ -64,7 +64,9 @@ def dict_files_related(address, web_site):
 def filter_foreign_source(address, web_site):
     site = urlparse(web_site).scheme + "://" + urlparse(web_site).hostname
     length = len(site)
-    if address[:length] == web_site:
+    logging.info('address is {}'.format(address))
+    logging.info('web site is {}'.format(site))
+    if address[:length] == site:
         logging.info('address {} is planned to be deleted.'.format(address))
     return True if address[:4] != web_site else False
 
