@@ -51,7 +51,9 @@ def dict_files_related(address):
                           for tag in soup.find_all('link', rel="stylesheet")]
 
     for lst in result.values():
+        logging.info('List before filtering {}'.format(str(lst)))
         lst = list(filter(filter_foreign_source, lst))
+        logging.info('List after filtering {}'.format(str(lst)))
 
     logging.info('List of parsed imgs:\n{}'.format(result['imgs']))
     logging.info('List of parsed scripts:\n{}'.format(result['scripts']))
