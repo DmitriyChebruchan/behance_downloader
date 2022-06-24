@@ -61,7 +61,7 @@ def dict_files_related(address):
 
 def filter_foreign_source(address):
     if address[:4] == 'http':
-        logging.ingo('address {} is planned to be deleted.'.format(address))
+        logging.info('address {} is planned to be deleted.'.format(address))
     return True if address[:4] != 'http' else False
 
 
