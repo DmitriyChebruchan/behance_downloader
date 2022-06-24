@@ -77,6 +77,9 @@ def dict_files_related(address):
                                                              src=True)]
     result['css_link'] = [tag['href']
                           for tag in soup.find_all('link', rel="stylesheet")]
+    logging.info('List of parsed imgs:\n{}'.format(result['imgs']))
+    logging.info('List of parsed scripts:\n{}'.format(result['scripts']))
+    logging.info('List of parsed css links:\n{}'.format(result['css_link']))
     return result
 
 
@@ -144,7 +147,7 @@ def img_downloader(name, url):
 
 
 def script_downloader(name, url):
-    logging.info('File {} is planned to be downloaded from {}.'.format(
+    logging.info('File {} is planned to be downloaded from {}'.format(
         name, url))
     try:
         data = requests.get(url).content
@@ -189,6 +192,9 @@ def download_supporting_files(addresses, urls, format):
         line = 'File {} with format {} will be downloaded from url {}'.format(
             name, format, url)
         logging.info(line)
+        if option.get(format) is None:
+            logging('Format of file is not correct.')
+            return
         option.get(format)(name, url)
 
 
@@ -221,7 +227,8 @@ def download_additional_files(file_name, dir, address_of_site):
     # dict with urls
     dict_of_files_urls_names = {}
     for key, value in dict_of_files.items():
-        logging.info('List of elements is {}'.format(str(value)))
+        logging.info('List of elements in {} list is \n{}'.format(str(key),
+                                                                  str(value)))
         dict_of_files_urls_names[key] = list(map(lambda x:
                                                  url_generator(address_of_site,
                                                                x), value))
