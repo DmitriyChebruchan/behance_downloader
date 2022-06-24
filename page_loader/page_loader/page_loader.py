@@ -38,7 +38,7 @@ def name_generator(dir, old_name):
     return new_name
 
 
-def dict_files_related(address):
+def dict_files_related(address, web_site):
     result = {'imgs': [],
               'scripts': [],
               'css_link': []}
@@ -52,7 +52,7 @@ def dict_files_related(address):
 
     for lst in result.values():
         logging.info('List before filtering {}'.format(str(lst)))
-        lst = list(filter(filter_foreign_source, lst))
+        lst = list(filter(lambda el: filter_foreign_source(el, web_site), lst))
         logging.info('List after filtering {}'.format(str(lst)))
 
     logging.info('List of parsed imgs:\n{}'.format(result['imgs']))
@@ -61,10 +61,12 @@ def dict_files_related(address):
     return result
 
 
-def filter_foreign_source(address):
-    if address[:4] == 'http':
+def filter_foreign_source(address, web_site):
+    site = urlparse(web_site).scheme + "://" + urlparse(web_site).hostname
+    length = len(site)
+    if address[:length] == web_site:
         logging.info('address {} is planned to be deleted.'.format(address))
-    return True if address[:4] != 'http' else False
+    return True if address[:4] != web_site else False
 
 
 def list_of_tags(soup, the_tag, attr):
@@ -89,8 +91,8 @@ def url_generator(web_site, name):
 
 
 def download_additional_files(file_name, dir, address_of_site):
-    dict_of_files = dict_files_related(file_name)
-    logging.info('dict of files is {}'.format(str(dict_files_related)))
+    dict_of_files = dict_files_related(file_name, address_of_site)
+    logging.info('dict of files is {}'.format(str(dict_of_files)))
 
     # dict with new names
     dict_of_new_names = {}
