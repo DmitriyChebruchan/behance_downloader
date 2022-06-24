@@ -66,9 +66,9 @@ def filter_foreign_source(address, web_site):
     length = len(site)
     logging.info('address is {}'.format(address))
     logging.info('web site is {}'.format(site))
-    if address[:length] == site:
+    if address[:length] != site:
         logging.info('address {} is planned to be deleted.'.format(address))
-    return True if address[:4] != web_site else False
+    return True if address[:length] != site else False
 
 
 def list_of_tags(soup, the_tag, attr):
