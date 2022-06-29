@@ -95,7 +95,7 @@ def url_generator(web_site, name):
 def download_additional_files(file_name, dir, address_of_site):
     dict_of_files = dict_files_related(file_name, address_of_site)
     logging.info('dict of files is {}'.format(str(dict_of_files)))
-
+    print(str(dict_of_files))
     # dict with new names
     dict_of_new_names = {}
     for key, value in dict_of_files.items():
