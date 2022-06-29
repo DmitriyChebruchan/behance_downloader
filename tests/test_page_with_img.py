@@ -47,6 +47,7 @@ def test_page_loader_with_img():
 test_page_loader_with_img()
 
 
+# download or file with 2 imgs
 @pook.on
 def test_page_loader_with_2_imgs():
 

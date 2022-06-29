@@ -50,10 +50,12 @@ def dict_files_related(address, web_site):
     result['css_link'] = [tag['href']
                           for tag in soup.find_all('link', rel="stylesheet")]
 
-    for lst in result.values():
-        logging.info('List before filtering {}'.format(str(lst)))
-        lst = list(filter(lambda el: filter_foreign_source(el, web_site), lst))
-        logging.info('List after filtering {}'.format(str(lst)))
+    for key in result:
+        logging.info('List before filtering {}'.format(str(result[key])))
+        result[key] = list(filter(lambda el: filter_foreign_source(el,
+                                                                   web_site),
+                                  result[key]))
+        logging.info('List after filtering {}\n'.format(str(result[key])))
 
     logging.info('List of parsed imgs:\n{}'.format(result['imgs']))
     logging.info('List of parsed scripts:\n{}'.format(result['scripts']))
@@ -154,7 +156,6 @@ def download(address_of_site, address_to_put=None):
         os.mkdir(dir)
     except FileExistsError:
         pass
-    logging.info('folder created or exists')
 
     # check if file contains additional files for download
     if has_related_files(file_name):
