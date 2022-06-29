@@ -64,9 +64,11 @@ def dict_files_related(address, web_site):
 
 
 def filter_foreign_source(address, web_site):
-    site = urlparse(web_site).scheme + "://" + urlparse(web_site).hostname
-    length = len(site)
-    return True if address[:length] == site or address[:4] != 'http' else False
+    if address[:4] != 'http':
+        return True
+    site_host = urlparse(web_site).scheme + "://" + urlparse(web_site).hostname
+    address_host = urlparse(address).scheme + "://" + urlparse(address).hostname
+    return True if address_host == site_host else False
 
 
 def list_of_tags(soup, the_tag, attr):
@@ -93,7 +95,7 @@ def url_generator(web_site, name):
 def download_additional_files(file_name, dir, address_of_site):
     dict_of_files = dict_files_related(file_name, address_of_site)
     logging.info('dict of files is {}'.format(str(dict_of_files)))
-    print(str(dict_of_files))
+
     # dict with new names
     dict_of_new_names = {}
     for key, value in dict_of_files.items():
