@@ -13,6 +13,18 @@ def normalize_address(string):
     return result
 
 
+def quantity_related_formats(address):
+    text = read_file(address)
+    soup = BeautifulSoup(text, 'html.parser')
+
+    scripts = soup.find_all("script", src=True)
+    css_links = soup.find_all("link", rel='stylesheet')
+    imgs = soup.find_all("img")
+
+    quantity = len(list(filter(lambda x: x != [], [scripts, css_links, imgs])))
+    return quantity
+
+
 def quantity_related_files(address):
     text = read_file(address)
     soup = BeautifulSoup(text, 'html.parser')

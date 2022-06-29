@@ -9,7 +9,7 @@ from page_loader.additionals.replacers import url_to_file_name, replace_links
 from page_loader.additionals.additional_files_downloader import\
     download_supporting_files
 from page_loader.additionals.additional_functions import \
-    quantity_related_files, read_file, write_in_file
+    quantity_related_formats, read_file, write_in_file
 
 
 def create_file(address, url):
@@ -66,10 +66,6 @@ def dict_files_related(address, web_site):
 def filter_foreign_source(address, web_site):
     site = urlparse(web_site).scheme + "://" + urlparse(web_site).hostname
     length = len(site)
-    logging.info('address is {}'.format(address))
-    logging.info('web site is {}'.format(site))
-    if address[:length] != site:
-        logging.info('address {} is planned to be deleted.'.format(address))
     return True if address[:length] == site or address[:4] != 'http' else False
 
 
@@ -119,11 +115,10 @@ def download_additional_files(file_name, dir, address_of_site):
                               dict_of_files_urls_names[key]]
 
     # download files
-    quantity = quantity_related_files(file_name)
+    quantity = quantity_related_formats(file_name)
     bar = Bar('Processing', max=quantity)
-    for i in range(quantity):
-        for key, lists in combined_dict.items():
-            download_supporting_files(*lists, key)
+    for key, lists in combined_dict.items():
+        download_supporting_files(*lists, key)
         bar.next()
     bar.finish()
 
