@@ -6,7 +6,7 @@ def download_supporting_files(addresses, urls, format):
     logging.info('List of files for download: \n' + str(addresses))
     option = {'imgs': img_downloader,
               'scripts': script_downloader,
-              'css_link': css_downloader}
+              'link': links_downloader}
     for name, url in zip(addresses, urls):
         line = 'File {} with format {} will be downloaded from url {}'.format(
             name, format, url)
@@ -49,7 +49,7 @@ def script_downloader(name, url):
     logging.info('Script file {} was downloaded'.format(name))
 
 
-def css_downloader(name, url):
+def links_downloader(name, url):
     logging.info('File {} is planned to be downloaded from {}.'.format(
         name, url))
     try:
@@ -64,4 +64,4 @@ def css_downloader(name, url):
 
     with open(name, 'w') as handler:
         handler.write(data)
-    logging.info('CSS file {} was downloaded'.format(name))
+    logging.info('Link file {} was downloaded'.format(name))

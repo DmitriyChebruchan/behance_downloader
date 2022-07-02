@@ -47,8 +47,7 @@ def dict_files_related(address, web_site):
     result['imgs'] = list_of_tags(soup, 'img', 'src')
     result['scripts'] = [tag['src'] for tag in soup.find_all('script',
                                                              src=True)]
-    result['css_link'] = [tag['href']
-                          for tag in soup.find_all('link', rel="stylesheet")]
+    result['link'] = [tag['href'] for tag in soup.find_all('link')]
 
     for key in result:
         logging.info('List before filtering {}'.format(str(result[key])))
@@ -59,7 +58,7 @@ def dict_files_related(address, web_site):
 
     logging.info('List of parsed imgs:\n{}'.format(result['imgs']))
     logging.info('List of parsed scripts:\n{}'.format(result['scripts']))
-    logging.info('List of parsed css links:\n{}'.format(result['css_link']))
+    logging.info('List of parsed links:\n{}'.format(result['link']))
     return result
 
 
@@ -68,10 +67,11 @@ def filter_foreign_source(address, web_site):
         return True
 
     site_host = urlparse(web_site).hostname
-    address_host = urlparse(address).hostname
+    address_host = urlparse(address).scheme + "://" + urlparse(address).hostname
     logging.info('Site-host is {}, address_host is {}'.format(site_host,
                                                               address_host))
-    return True if address_host == site_host else False
+    first_letter = len(address_host) - len(site_host)
+    return True if address_host[first_letter:] == site_host else False
 
 
 def list_of_tags(soup, the_tag, attr):
