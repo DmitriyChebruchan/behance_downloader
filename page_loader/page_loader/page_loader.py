@@ -51,8 +51,8 @@ def dict_files_related(address, web_site):
 
     for key in result:
         logging.info('List before filtering {}'.format(str(result[key])))
-        result[key] = list(filter(lambda el: filter_foreign_source(el,
-                                                                   web_site),
+        result[key] = list(filter(lambda el: checker_local_source(el,
+                                                                  web_site),
                                   result[key]))
         logging.info('List after filtering {}\n'.format(str(result[key])))
 
@@ -62,16 +62,15 @@ def dict_files_related(address, web_site):
     return result
 
 
-def filter_foreign_source(address, web_site):
+def checker_local_source(address, web_site):
     if address[:4] != 'http':
         return True
 
     site_host = urlparse(web_site).hostname
-    address_host = urlparse(address).scheme + "://" + urlparse(address).hostname
+    address_host = urlparse(address).hostname
     logging.info('Site-host is {}, address_host is {}'.format(site_host,
                                                               address_host))
-    first_letter = len(address_host) - len(site_host)
-    return True if address_host[first_letter:] == site_host else False
+    return True if address_host == site_host else False
 
 
 def list_of_tags(soup, the_tag, attr):
