@@ -32,9 +32,10 @@ def has_related_files(address):
     return tag
 
 
+# generates new name for file based on dir to put and old name
 def name_generator(dir, old_name):
-    updated_name = old_name.split("/")[-1:][0]
-    new_name = '/'.join([dir, updated_name])
+    last_name_part = old_name.split("/")[-1]
+    new_name = '/'.join([dir, last_name_part])
     return new_name
 
 
@@ -112,7 +113,7 @@ def download_additional_files(file_name, dir, address_of_site):
                                                  url_generator(address_of_site,
                                                                x), value))
 
-    # combined dict
+    # combined dict of new names and urls
     combined_dict = {}
     for key in dict_of_new_names:
         combined_dict[key] = [dict_of_new_names[key],
@@ -147,18 +148,23 @@ def download(address_of_site, address_to_put=None):
 
     # creating HTML file
     file_name = create_file(address_to_put, address_of_site)
-    write_in_file(file_name, r.text)
+    soup = BeautifulSoup(r.text, 'html.parser').prettify()
+    write_in_file(file_name, soup)
 
     # creating folder
     dir = file_name[:-5] + "_files"
     try:
         os.mkdir(dir)
     except FileExistsError:
+        logging.log('Folder already exists')
         pass
+
+    dir_with_additional_files = dir.split('/')[-1]
 
     # check if file contains additional files for download
     if has_related_files(file_name):
-        download_additional_files(file_name, dir, address_of_site)
+        download_additional_files(file_name, dir_with_additional_files,
+                                  address_of_site)
     logging.info('files downloaded')
 
     return file_name

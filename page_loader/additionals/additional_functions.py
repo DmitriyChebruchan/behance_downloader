@@ -18,10 +18,10 @@ def quantity_related_formats(address):
     soup = BeautifulSoup(text, 'html.parser')
 
     scripts = soup.find_all("script", src=True)
-    css_links = soup.find_all("link", rel='stylesheet')
+    links = soup.find_all("link")
     imgs = soup.find_all("img")
 
-    quantity = len(list(filter(lambda x: x != [], [scripts, css_links, imgs])))
+    quantity = len(list(filter(lambda x: x != [], [scripts, links, imgs])))
     return quantity
 
 
@@ -30,10 +30,10 @@ def quantity_related_files(address):
     soup = BeautifulSoup(text, 'html.parser')
 
     scripts = soup.find_all("script", src=True)
-    css_links = soup.find_all("link", rel='stylesheet')
+    links = soup.find_all("link")
     imgs = soup.find_all("img")
 
-    quantity = len(scripts + css_links + imgs)
+    quantity = len(scripts + links + imgs)
     return quantity
 
 

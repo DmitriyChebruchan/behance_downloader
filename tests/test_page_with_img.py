@@ -40,6 +40,8 @@ def test_page_loader_with_img():
     path_to_folder = os.getcwd() + '/guides-hexlet-io-something_more_files'
     shutil.rmtree(path_to_folder)
     os.remove(os.getcwd() + '/guides-hexlet-io-something_more.html')
+    print('result is \n' + result + '\n')
+    print('expeted is \n' + expected_result)
     assert result == expected_result
 
 
