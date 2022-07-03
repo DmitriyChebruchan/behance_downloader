@@ -35,7 +35,8 @@ def has_related_files(address):
 # generates new name for file based on dir to put and old name
 def name_generator(dir, old_name):
     last_name_part = old_name.split("/")[-1]
-    new_name = '/'.join([dir, last_name_part])
+    folder = dir.split("/")[-1]
+    new_name = '/'.join([folder, last_name_part])
     return new_name
 
 
@@ -149,6 +150,7 @@ def download(address_of_site, address_to_put=None):
     # creating HTML file
     file_name = create_file(address_to_put, address_of_site)
     soup = BeautifulSoup(r.text, 'html.parser').prettify()
+    print(soup)
     write_in_file(file_name, soup)
 
     # creating folder
@@ -159,12 +161,9 @@ def download(address_of_site, address_to_put=None):
         logging.log('Folder already exists')
         pass
 
-    dir_with_additional_files = dir.split('/')[-1]
-
     # check if file contains additional files for download
     if has_related_files(file_name):
-        download_additional_files(file_name, dir_with_additional_files,
-                                  address_of_site)
+        download_additional_files(file_name, dir, address_of_site)
     logging.info('files downloaded')
 
     return file_name
