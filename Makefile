@@ -13,6 +13,7 @@ package-install:
 update:
 	make build
 	make publish
+	python3 -m pip install --user dist/*.whl
 	make package-install
 
 pytest:
@@ -25,7 +26,7 @@ push:
 	make lint
 	make pytest
 	git add .
-	git commit -m '$(M)'
+	git commit -m '$(m)'
 	git push
 
 run:
