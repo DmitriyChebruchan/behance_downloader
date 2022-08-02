@@ -13,8 +13,8 @@ from page_loader.additionals.additional_functions import \
 
 
 def create_file(address, url):
-    url = url_to_file_name(url)
-    name_of_file = os.path.join(address, url)
+    file_name = url_to_file_name(url)
+    name_of_file = os.path.join(address, file_name)
     f = open(name_of_file, "w")
     f.close()
     return name_of_file
@@ -149,9 +149,8 @@ def download(address_of_site, address_to_put=None):
     if address_to_put is None:
         address_to_put = os.getcwd()
 
-    # creating HTML file
-    file_name = create_file(address_to_put, address_of_site)
-    print(file_name + ' file for links created.')
+
+    # collecting links
     soup = BeautifulSoup(r.text, 'html.parser')
     links = list_of_tags(soup, 'a', 'href', 'title', 'Link to project')
     print(str(len(links)) + ' links collected, filtering links.')
@@ -165,7 +164,12 @@ def download(address_of_site, address_to_put=None):
         i = i + 1
     print(result)
     
-    write_in_file(file_name, result)
+    # creating file
+    file_name = create_file(address_to_put, address_of_site)
+    print(file_name + ' file for links created.')
+
+    # saving in file
+    write_in_file(file_name, links)
     print('Links were added to file.')
 
 

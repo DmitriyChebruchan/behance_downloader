@@ -56,5 +56,5 @@ def url_to_file_name(url):
     url = url.replace('https://', '')
     url = url.replace('http://', '')
     url = url.replace('/', '-')
-    url = url.replace('.', '-') + '.html'
+    url = url.replace('.', '-') + '.txt'
     return url
