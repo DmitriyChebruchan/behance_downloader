@@ -19,7 +19,7 @@ pytest:
 	poetry run pytest
 
 lint:
-	@poetry run flake8
+	@poetry run flake8 --exclude .git, .venv
 
 push:
 	make lint
@@ -29,4 +29,4 @@ push:
 	git push
 
 run:
-	poetry run page-loader https://guides.hexlet.io/
+	@poetry run page-loader https://www.behance.net/

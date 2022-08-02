@@ -43,10 +43,8 @@ def name_generator(dir, old_name):
     return new_name
 
 
-# placing prettified text in HTML file
+# placing prettified text file
 def write_in_file(file_name, text):
-    soup = BeautifulSoup(text, 'html.parser').prettify()
     with open(file_name, 'w') as output_file:
-        output_file.write(soup)
-    logging.info('HTML file created')
-    logging.info('HTML file is \n{}'.format(soup))
+        output_file.write(str(text))
+    logging.info('File created')

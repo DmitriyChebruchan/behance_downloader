@@ -75,8 +75,12 @@ def checker_local_source(address, web_site):
     return True if address_host == site_host else False
 
 
-def list_of_tags(soup, the_tag, attr):
-    return [tag[attr] for tag in soup.find_all(the_tag)]
+def list_of_tags(soup, the_tag, first_attr, second_attr, value):
+    result = [[tag.get(first_attr), tag.get(second_attr)] for tag in soup.find_all(the_tag)]
+    result = list(filter(lambda x: x[0] != '', result))
+    result = list(filter(lambda x: x[1] == value, result))
+    result = list(map(lambda x: x[0], result))
+    return result
 
 
 def url_generator(web_site, name):
@@ -132,11 +136,9 @@ def download_additional_files(file_name, dir, address_of_site):
     replace_links(file_name, combined_dict, dict_of_files)
 
 
-def download(address_of_site, address_to_put=None):
-    logging.info('Address of site is {}'.format(address_of_site))
-    logging.info('Folder to put is {}'.format(address_to_put))
 
-    logging.info('sending request to {}'.format(address_of_site))
+def download(address_of_site, address_to_put=None):
+    print('Sending request.')
     r = requests.get(address_of_site)
     status_code = r.status_code
     if status_code != 200:
@@ -149,21 +151,48 @@ def download(address_of_site, address_to_put=None):
 
     # creating HTML file
     file_name = create_file(address_to_put, address_of_site)
-    soup = BeautifulSoup(r.text, 'html.parser').prettify()
-    print(soup)
-    write_in_file(file_name, soup)
+    print(file_name + ' file for links created.')
+    soup = BeautifulSoup(r.text, 'html.parser')
+    links = list_of_tags(soup, 'a', 'href', 'title', 'Link to project')
+    print(str(len(links)) + ' links collected, filtering links.')
 
-    # creating folder
-    dir = file_name[:-5] + "_files"
-    try:
-        os.mkdir(dir)
-    except FileExistsError:
-        logging.log('Folder already exists')
-        pass
+    links = filter_incorrect_rights(links)
+    result = ""
 
-    # check if file contains additional files for download
-    if has_related_files(file_name):
-        download_additional_files(file_name, dir, address_of_site)
-    logging.info('files downloaded')
+    i = 1
+    while i < len(links) + 1:
+        result = result + str(i) + ". " + str(links[i - 1]) + '\n'
+        i = i + 1
+    print(result)
+    
+    write_in_file(file_name, result)
+    print('Links were added to file.')
 
-    return file_name
+
+def filter_incorrect_rights(links):
+    updated_list = []
+    quantity = len(links)
+    bar = Bar('Processing', max=quantity)
+    for el in links:
+        if rights_checker(el):
+            updated_list.append(el)
+        bar.next()
+    bar.finish()
+    return updated_list
+
+
+def rights_checker(link):
+    r = requests.get(link)
+    soup = BeautifulSoup(r.text, 'html.parser')
+    srcs = [tag.get('src') for tag in soup.find_all('img')]
+    correct_img = 'https://a5.behance.net/2277ca0ee5896a498f5d6b1e4afd27cbb8b71435/img/project/cc/by.svg?cb=264615658'
+    result = bool(list(filter(lambda x: x == correct_img, srcs)))
+    return result
+
+
+def list_of_tags(soup, the_tag, first_attr, second_attr, value):
+    result = [[tag.get(first_attr), tag.get(second_attr)] for tag in soup.find_all(the_tag)]
+    result = list(filter(lambda x: x[0] != '', result))
+    result = list(filter(lambda x: x[1] == value, result))
+    result = list(map(lambda x: x[0], result))
+    return result
