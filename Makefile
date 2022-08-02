@@ -20,11 +20,10 @@ pytest:
 	poetry run pytest
 
 lint:
-	@poetry run flake8 --exclude .git, .venv
+	@poetry run flake8
 
 push:
 	make lint
-	make pytest
 	git add .
 	git commit -m '$(m)'
 	git push

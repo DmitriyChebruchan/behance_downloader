@@ -76,7 +76,8 @@ def checker_local_source(address, web_site):
 
 
 def list_of_tags(soup, the_tag, first_attr, second_attr, value):
-    result = [[tag.get(first_attr), tag.get(second_attr)] for tag in soup.find_all(the_tag)]
+    result = [[tag.get(first_attr), tag.get(second_attr)] for tag in
+              soup.find_all(the_tag)]
     result = list(filter(lambda x: x[0] != '', result))
     result = list(filter(lambda x: x[1] == value, result))
     result = list(map(lambda x: x[0], result))
@@ -136,7 +137,6 @@ def download_additional_files(file_name, dir, address_of_site):
     replace_links(file_name, combined_dict, dict_of_files)
 
 
-
 def download(address_of_site, address_to_put=None):
     print('Sending request.')
     r = requests.get(address_of_site)
@@ -148,7 +148,6 @@ def download(address_of_site, address_to_put=None):
 
     if address_to_put is None:
         address_to_put = os.getcwd()
-
 
     # collecting links
     soup = BeautifulSoup(r.text, 'html.parser')
@@ -163,7 +162,7 @@ def download(address_of_site, address_to_put=None):
         result = result + str(i) + ". " + str(links[i - 1]) + '\n'
         i = i + 1
     print(result)
-    
+
     # creating file
     file_name = create_file(address_to_put, address_of_site)
     print(file_name + ' file for links created.')
@@ -189,14 +188,7 @@ def rights_checker(link):
     r = requests.get(link)
     soup = BeautifulSoup(r.text, 'html.parser')
     srcs = [tag.get('src') for tag in soup.find_all('img')]
-    correct_img = 'https://a5.behance.net/2277ca0ee5896a498f5d6b1e4afd27cbb8b71435/img/project/cc/by.svg?cb=264615658'
+    correct_img = 'https://a5.behance.net/2277ca0ee5896a498f5d6b1e4' + \
+        'afd27cbb8b71435/img/project/cc/by.svg?cb=264615658'
     result = bool(list(filter(lambda x: x == correct_img, srcs)))
-    return result
-
-
-def list_of_tags(soup, the_tag, first_attr, second_attr, value):
-    result = [[tag.get(first_attr), tag.get(second_attr)] for tag in soup.find_all(the_tag)]
-    result = list(filter(lambda x: x[0] != '', result))
-    result = list(filter(lambda x: x[1] == value, result))
-    result = list(map(lambda x: x[0], result))
     return result
