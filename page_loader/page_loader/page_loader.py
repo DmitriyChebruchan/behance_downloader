@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
+import json
 import requests
 import os
 import logging
 from bs4 import BeautifulSoup
 from progress.bar import Bar
 from urllib.parse import urlparse
-from page_loader.additionals.replacers import url_to_file_name, replace_links
-from page_loader.additionals.additional_files_downloader import\
-    download_supporting_files
-from page_loader.additionals.additional_functions import \
-    quantity_related_formats, read_file, write_in_file
+from page_loader.additionals.replacers import url_to_file_name
+from page_loader.additionals.additional_functions import read_file
 
 
 def create_file(address, url):
@@ -40,41 +38,6 @@ def name_generator(dir, old_name):
     return new_name
 
 
-def dict_files_related(address, web_site):
-    result = {'imgs': [],
-              'scripts': [],
-              'css_link': []}
-    soup = BeautifulSoup(read_file(address), 'html.parser')
-
-    result['imgs'] = list_of_tags(soup, 'img', 'src')
-    result['scripts'] = [tag['src'] for tag in soup.find_all('script',
-                                                             src=True)]
-    result['link'] = [tag['href'] for tag in soup.find_all('link')]
-
-    for key in result:
-        logging.info('List before filtering {}'.format(str(result[key])))
-        result[key] = list(filter(lambda el: checker_local_source(el,
-                                                                  web_site),
-                                  result[key]))
-        logging.info('List after filtering {}\n'.format(str(result[key])))
-
-    logging.info('List of parsed imgs:\n{}'.format(result['imgs']))
-    logging.info('List of parsed scripts:\n{}'.format(result['scripts']))
-    logging.info('List of parsed links:\n{}'.format(result['link']))
-    return result
-
-
-def checker_local_source(address, web_site):
-    if address[:4] != 'http':
-        return True
-
-    site_host = urlparse(web_site).hostname
-    address_host = urlparse(address).hostname
-    logging.info('Site-host is {}, address_host is {}'.format(site_host,
-                                                              address_host))
-    return True if address_host == site_host else False
-
-
 def list_of_tags(soup, the_tag, first_attr, second_attr, value):
     result = [[tag.get(first_attr), tag.get(second_attr)] for tag in
               soup.find_all(the_tag)]
@@ -101,45 +64,10 @@ def url_generator(web_site, name):
         return web_site + name
 
 
-def download_additional_files(file_name, dir, address_of_site):
-    dict_of_files = dict_files_related(file_name, address_of_site)
-    logging.info('dict of files is {}'.format(str(dict_of_files)))
-
-    # dict with new names
-    dict_of_new_names = {}
-    for key, value in dict_of_files.items():
-        dict_of_new_names[key] = [name_generator(dir, x) for x in value]
-
-    # dict with urls
-    dict_of_files_urls_names = {}
-    for key, value in dict_of_files.items():
-        logging.info('List of elements in {} list is \n{}'.format(str(key),
-                                                                  str(value)))
-        dict_of_files_urls_names[key] = list(map(lambda x:
-                                                 url_generator(address_of_site,
-                                                               x), value))
-
-    # combined dict of new names and urls
-    combined_dict = {}
-    for key in dict_of_new_names:
-        combined_dict[key] = [dict_of_new_names[key],
-                              dict_of_files_urls_names[key]]
-
-    # download files
-    quantity = quantity_related_formats(file_name)
-    bar = Bar('Processing', max=quantity)
-    for key, lists in combined_dict.items():
-        download_supporting_files(*lists, key)
-        bar.next()
-    bar.finish()
-
-    # replacing links in HTML file
-    replace_links(file_name, combined_dict, dict_of_files)
-
-
 def download(address_of_site, address_to_put=None):
     print('Sending request.')
     r = requests.get(address_of_site)
+
     status_code = r.status_code
     if status_code != 200:
         raise Warning('Status_code is {}'.format(status_code))
@@ -155,27 +83,68 @@ def download(address_of_site, address_to_put=None):
     print(str(len(links)) + ' links collected, filtering links.')
 
     links = filter_incorrect_rights(links)
-    result = ""
 
+    # show result
+    result = result_generator(links)
+    print('result is \n{}'.format(result))
+
+    # creating file
+    file_name = create_file(address_to_put, address_of_site)
+    print('{} file for links created. \n{} links added'.format(len(file_name),
+                                                               links))
+
+    # saving in file
+    if links == []:
+        print('No links collected.')
+        return
+    append_JSON_file(links, file_name)
+    print('Links were added to file.')
+
+
+def append_JSON_file(information, file):
+    list_of_el = read_JSON_file(file)
+    if list_of_el == '':
+        list_of_el = []
+    list_of_el.append(information)
+    write_JSON_file(file, list_of_el)
+
+
+def read_JSON_file(file):
+    with open(file, 'r') as f:
+        return json.load(f)
+
+
+def write_JSON_file(file, information):
+    with open(file, "w") as f:
+        json.dump(information, f, indent=4, separators=(',', ': '))
+# def download(*args):
+#     driver = webdriver.Chrome()
+#     driver.get('https://www.behance.net')
+
+#     elems = driver.find_elements_by_xpath("//a[@title='Link to project']")
+#     links = []
+
+#     for elem in elems:
+#         links.append(elem.get_attribute('title'))
+#         print('Title : ' +elem.get_attribute('title'))
+
+#     print(links)
+#     return
+
+
+def result_generator(links):
+    result = ""
     i = 1
     while i < len(links) + 1:
         result = result + str(i) + ". " + str(links[i - 1]) + '\n'
         i = i + 1
-    print(result)
-
-    # creating file
-    file_name = create_file(address_to_put, address_of_site)
-    print(file_name + ' file for links created.')
-
-    # saving in file
-    write_in_file(file_name, links)
-    print('Links were added to file.')
+    return result
 
 
 def filter_incorrect_rights(links):
     updated_list = []
-    quantity = len(links)
-    bar = Bar('Processing', max=quantity)
+
+    bar = Bar('Processing', max=len(links))
     for el in links:
         if rights_checker(el):
             updated_list.append(el)
