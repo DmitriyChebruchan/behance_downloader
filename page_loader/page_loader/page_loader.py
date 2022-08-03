@@ -90,8 +90,8 @@ def download(address_of_site, address_to_put=None):
 
     # creating file
     file_name = create_file(address_to_put, address_of_site)
-    print('{} file for links created. \n{} links added'.format(len(file_name),
-                                                               links))
+    print('{} file for links created. \n{} links added'.format(str(file_name),
+                                                               len(links)))
 
     # saving in file
     if links == []:
