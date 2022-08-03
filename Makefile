@@ -29,4 +29,4 @@ push:
 	git push
 
 run:
-	@poetry run page-loader https://www.behance.net/
+	@poetry run page-loader https://www.behance.net/search/projects?field=graphic%20design
